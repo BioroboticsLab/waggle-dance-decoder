@@ -5,7 +5,7 @@ img_int     = zeros(n,n);
 center      = [ceil(n/2) ceil(n/2)];
 
 D           = fftshift(fft2(DoG3(n, center, 30*eye(2), center, 4*eye(2))));
-imagesc(abs(D)) 
+imagesc(abs(D))
 
 
 for i = 2 : length(IMGS)
@@ -13,7 +13,7 @@ for i = 2 : length(IMGS)
     img_diff = img_last - img_cur;
     img_diff = filter2([1 1 1; 1 1 1; 1 1 1]/9, img_diff);
 %     FDI = abs((D .* fftshift(fft2(img_diff))));
-    FDI = abs((fftshift(fft2(img_diff))));    
+    FDI = abs((fftshift(fft2(img_diff))));
     img_int = img_int + FDI;
     img_last = img_cur;
 end
@@ -33,7 +33,6 @@ a = atan2(v(2,2), v(1,2))*180/pi;
 % for a = angles
 % q = [q max(radon(img_int, a))];
 % end
-% 
+%
 % [~, i] = max(q);
 % a = angles(i);
-   
