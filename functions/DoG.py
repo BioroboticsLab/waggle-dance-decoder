@@ -33,3 +33,12 @@ class DoG:
                                         -  multivariate_normal.pdf(point_two, mean=[i,j], cov=cov_matrix)
 
         return kernel
+
+    def mexican_head_kernel(self, kernel_size, mean1, cov1, mean2, cov2):
+        dog = np.zeros(shape=(kernel_size, kernel_size))
+
+        for x in range(kernel_size):
+            for y in range(kernel_size):
+                dog[y,x] = multivariate_normal.pdf([x, y], mean=mean1, cov=cov1) - multivariate_normal.pdf([x, y], mean=mean1, cov=cov2);
+
+        return dog
