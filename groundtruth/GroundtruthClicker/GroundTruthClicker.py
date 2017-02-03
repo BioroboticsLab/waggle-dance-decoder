@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import os
 import csv
+import sys
 from math import ceil
 from ast import literal_eval as make_tuple
 
@@ -44,7 +45,7 @@ class Draw:
             self.drawn = True
             self.draw_line()
 
-    def draw_line(self):
+    def draw_line(self, image):
         if len(self.refernce_point) > 0:
             cv2.line(image, self.refernce_point[0], self.refernce_point[1], (0, 255, 0), 1)
             cv2.imshow("Click and Draw", image)
@@ -150,66 +151,76 @@ class VidPlayer:
 
 #image = cv2.imread('/home/sascwitt/Projects/test/testPics/Lauf1/image_001.png')
 #vc = cv2.VideoCapture('/home/sascwitt/Projects/test/testPics/kurz/image_%3d.png')
+def main(argv=None):
 
-path = '/home/sascwitt/Projects/test/WDs/'
+    if (argv is None):
+        argv = sys.argv
+        if (argv is None):
+            path = input("Please enter WaggleDance Path")
 
-vp = VidPlayer()
+    if (len(argv) == 2):
+        path = argv[1]
 
-folders = os.listdir(path)
-folders.sort()
-draw = Draw()
 
-cv2.namedWindow("Click and Draw")
-cv2.setMouseCallback("Click and Draw", draw.draw_line_from_center)
+    vp = VidPlayer()
+    folders = os.listdir(path)
+    folders.sort()
+    draw = Draw()
 
-counter = 0
-first_frame = True
+    cv2.namedWindow("Click and Draw")
+    cv2.setMouseCallback("Click and Draw", draw.draw_line_from_center)
 
-for folder in folders:
-    tmp_path = path + folder
-    wd_runs = os.listdir(tmp_path)
+    counter = 0
+    first_frame = True
 
-    for run in wd_runs:
-        vp.set_vid_path(tmp_path + '/' +  run + '/' +'image_%3d.png')
-        capture = vp.get_vid_capture()
+    for folder in folders:
+        tmp_path = path + folder
+        wd_runs = os.listdir(tmp_path)
 
-        while(vp.get_vid_running()):
-            ret, image = capture.read()
-            if (ret == True):
-                image = cv2.resize(image, None, fx = 3, fy = 3, interpolation = cv2.INTER_CUBIC)
+        for run in wd_runs:
+            vp.set_vid_path(tmp_path + '/' +  run + '/' +'image_%3d.png')
+            capture = vp.get_vid_capture()
 
-                if (os.path.isfile(tmp_path + '/' +  run + '/' + "result.csv") and first_frame):
-                    start = 0
-                    end  = 0
+            while(vp.get_vid_running()):
+                ret, image = capture.read()
+                if (ret == True):
+                    image = cv2.resize(image, None, fx = 3, fy = 3, interpolation = cv2.INTER_CUBIC)
 
-                    with open(tmp_path + '/' +  run + '/' + "result.csv") as csvfile:
-                        reader = csv.DictReader(csvfile)
-                        for row in reader:
-                            start = make_tuple(row['\ufeffStart Point'])
-                            end   = make_tuple(row['End Point'])
+                    if (os.path.isfile(tmp_path + '/' +  run + '/' + "result.csv") and first_frame):
+                        start = 0
+                        end  = 0
 
-                    draw.set_refernce_points(start, end)
-                    first_frame = False
+                        with open(tmp_path + '/' +  run + '/' + "result.csv") as csvfile:
+                            reader = csv.DictReader(csvfile)
+                            for row in reader:
+                                start = make_tuple(row['\ufeffStart Point'])
+                                end   = make_tuple(row['End Point'])
 
-                draw.draw_line()
-                cv2.imshow("Click and Draw", image)
-                vp.vid_player_controlls()
+                        draw.set_refernce_points(start, end)
+                        first_frame = False
 
-            else:
-                capture = vp.vid_restart()
+                    draw.draw_line(image)
+                    cv2.imshow("Click and Draw", image)
+                    vp.vid_player_controlls()
 
-        draw.calc_angle()
+                else:
+                    capture = vp.vid_restart()
 
-        if (draw.get_drawn()):
-            with open(tmp_path + '/' + run + '/' + 'result.csv', 'w', newline='', encoding='utf-8-sig') as out:
-                csv_out = csv.writer(out)
-                csv_out.writerow(['Start Point'] + ['End Point'] + ['Angle'])
-                csv_out.writerow([draw.get_refernce_points()[0]] + [draw.get_refernce_points()[1]] + [draw.get_angle()])
-                counter += 1
+            draw.calc_angle()
 
-        print(counter)
-        draw.reset_drawing()
-        first_frame = True
+            if (draw.get_drawn()):
+                with open(tmp_path + '/' + run + '/' + 'result.csv', 'w', newline='', encoding='utf-8-sig') as out:
+                    csv_out = csv.writer(out)
+                    csv_out.writerow(['Start Point'] + ['End Point'] + ['Angle'])
+                    csv_out.writerow([draw.get_refernce_points()[0]] + [draw.get_refernce_points()[1]] + [draw.get_angle()])
+                    counter += 1
 
-capture.release()
-cv2.destroyAllWindows()
+            print(counter)
+            draw.reset_drawing()
+            first_frame = True
+
+        capture.release()
+        cv2.destroyAllWindows()
+
+if __name__ == "__main__":
+    main()
