@@ -35,7 +35,7 @@ def create_diff_images(path, folders, smothing = np.matrix([[1,1,1],[1,1,1],[1,1
                         continue
 
                     else:
-                        frame_diff = last_frame.astype(float) - frame.astype(float)
+                        frame_diff = abs(last_frame.astype(float)) - abs(frame.astype(float))
                         frame_diff = cv2.filter2D(frame_diff, -1, smothing)
 
 
