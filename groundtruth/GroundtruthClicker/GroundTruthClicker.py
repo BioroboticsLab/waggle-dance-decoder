@@ -1,14 +1,14 @@
 import cv2
 import numpy as np
 import os
+import datetime
 import csv
 import sys
 from math import ceil
 from ast import literal_eval as make_tuple
 
-#100 Schwänzelläufe
-#punkte raus spiechern
-#csv
+#200 Waggle runs
+#vector and angle stored as csv
 
 '''
 Class to Draw Stuff on Images or Frames with OpenCV
@@ -38,7 +38,9 @@ class Draw:
 
     def draw_line_from_center(self, event, x, y, flags, param):
         if event == cv2.EVENT_LBUTTONUP:
-            size_x, size_y, colors = image.shape
+            #size_x, size_y, colors = image.shape            
+            size_x = 250
+            size_y = 250
             self.refernce_point = [(ceil(size_x/2), ceil(size_y/2))]
             self.refernce_point.append((x, y))
 
@@ -142,21 +144,18 @@ class VidPlayer:
                 self._vid_paused = False
                 self._vid_speed = 50
 
-        elif key == ord("c"):
+        elif key == ord("c") or key == ord("C"):
             self._vid_running = False
 
     def vid_restart(self):
         self._vid_capture = cv2.VideoCapture(self._vid_path)
         return self._vid_capture
 
-#image = cv2.imread('/home/sascwitt/Projects/test/testPics/Lauf1/image_001.png')
-#vc = cv2.VideoCapture('/home/sascwitt/Projects/test/testPics/kurz/image_%3d.png')
-def main(argv=None):
 
-    if (argv is None):
-        argv = sys.argv
-        if (argv is None):
-            path = input("Please enter WaggleDance Path")
+def main():
+    argv = sys.argv
+    if (len(argv) == 1):
+        path = input("Please enter WaggleDance Path")
 
     if (len(argv) == 2):
         path = argv[1]
@@ -174,31 +173,17 @@ def main(argv=None):
     first_frame = True
 
     for folder in folders:
-        tmp_path = path + folder
+        tmp_path = os.path.join(path,folder)        
         wd_runs = os.listdir(tmp_path)
 
         for run in wd_runs:
-            vp.set_vid_path(tmp_path + '/' +  run + '/' +'image_%3d.png')
+            vp.set_vid_path(tmp_path + '/' + run + '/' + 'image_%03d.png')
             capture = vp.get_vid_capture()
 
             while(vp.get_vid_running()):
-                ret, image = capture.read()
+                ret, image = capture.read()                
                 if (ret == True):
-                    image = cv2.resize(image, None, fx = 3, fy = 3, interpolation = cv2.INTER_CUBIC)
-
-                    if (os.path.isfile(tmp_path + '/' +  run + '/' + "result.csv") and first_frame):
-                        start = 0
-                        end  = 0
-
-                        with open(tmp_path + '/' +  run + '/' + "result.csv") as csvfile:
-                            reader = csv.DictReader(csvfile)
-                            for row in reader:
-                                start = make_tuple(row['\ufeffStart Point'])
-                                end   = make_tuple(row['End Point'])
-
-                        draw.set_refernce_points(start, end)
-                        first_frame = False
-
+                    image = cv2.resize(image, None, fx = 5, fy = 5, interpolation = cv2.INTER_CUBIC)
                     draw.draw_line(image)
                     cv2.imshow("Click and Draw", image)
                     vp.vid_player_controlls()
@@ -211,16 +196,40 @@ def main(argv=None):
             if (draw.get_drawn()):
                 with open(tmp_path + '/' + run + '/' + 'result.csv', 'w', newline='', encoding='utf-8-sig') as out:
                     csv_out = csv.writer(out)
-                    csv_out.writerow(['Start Point'] + ['End Point'] + ['Angle'])
-                    csv_out.writerow([draw.get_refernce_points()[0]] + [draw.get_refernce_points()[1]] + [draw.get_angle()])
+                    csv_out.writerow(['Key'] + ['Start Point'] + ['End Point'] + ['Angle'])
+                    csv_out.writerow( [folder + '/' + run] + [draw.get_refernce_points()[0]] + [draw.get_refernce_points()[1]] + [draw.get_angle()])
                     counter += 1
 
             print(counter)
             draw.reset_drawing()
             first_frame = True
 
-        capture.release()
-        cv2.destroyAllWindows()
-
+    capture.release()
+    cv2.destroyAllWindows()
+        
+    # FROM HERE
+    #Iterates through all the dances
+    for folder in folders:
+        #Sets the path to the current dance
+        tmp_path = os.path.join(path,folder)
+        #Filters list of waggle runs
+        wd_runs = os.listdir(tmp_path)
+        #Iterates through the waggle runs
+        for run in wd_runs:
+            #Path to next run
+            key = os.path.join(tmp_path,run)
+            #Reading
+        
+            with open(key + '/' + 'result.csv', 'rt', encoding='utf-8-sig') as in_file:
+                reader = csv.reader(in_file, delimiter=',', quotechar='|')
+                row = next(reader)
+                row = next(reader)                
+            
+            i = datetime.datetime.now()            
+            with open('Data/GTData/' + str(i.strftime('%Y%m%d_%H%M')) + '.csv', 'at', newline='') as out_file:            
+                writer = csv.writer(out_file, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)                
+                writer.writerow(row)    
+    # TO HERE
+    print ('Your data has been correctly saved in ' + str(i.strftime('%Y%m%d_%H%M')) + '.csv')
 if __name__ == "__main__":
     main()
