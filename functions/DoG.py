@@ -7,7 +7,7 @@ class DoG:
     '''
     Prepares the given Data to create a DoG kernel
     '''
-    def get_dog_kernel(self, angle, dist_mean, kernel_width, cov_matrix):
+    def get_dog_kernel(self, angle, dist_mean, sigma, kernel_width, cov_matrix):
         kernel = np.zeros(shape=(kernel_width, kernel_width))
 
         center = [int((kernel_width) / 2), int((kernel_width) / 2)]
