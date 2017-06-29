@@ -12,7 +12,8 @@ class VidPlayer:
     _vid_speed = 50
     _vid_paused = False
     _vid_running = True
-    _vid_dance = ''
+    _vid_direction = True
+    _vid_dance = ''    
 
     def __init__(self, path = None):        
         self._vid_path    = path
@@ -31,6 +32,9 @@ class VidPlayer:
     
     def set_vid_dance(self, dance):
         self._vid_dance = dance
+    
+    def set_vid_direction(self, direction):
+        self._vid_direction = direction
 
     '''
     Returns the actual path of the video source
@@ -58,6 +62,9 @@ class VidPlayer:
     
     def get_vid_dance(self):
         return self._vid_dance
+        
+    def get_vid_direction(self):
+        return self._vid_direction
 
     '''
     Some Controlls
@@ -81,14 +88,32 @@ class VidPlayer:
                 self._vid_speed = 50
 
         elif key == ord("y") or key == ord("Y"):
-            self._vid_running = False
-            #print('Dance')
+            self._vid_running = False            
             self._vid_dance = 0
+            self._vid_direction = True
         
         elif key == ord("n") or key == ord("N"):
-            self._vid_running = False
-            #print('No Dance')
+            self._vid_running = False            
             self._vid_dance = 1
+            self._vid_direction = True
+        
+        #Up arrow key 
+        elif key == ord("w") or key == ord("W"):
+            self._vid_running = False            
+            self._vid_direction = False
+        #Down arrow key
+        elif key == ord("s") or key == ord("S"):
+            self._vid_running = False            
+            self._vid_direction = True        
+        #Left arrow key 
+        elif key == ord("a") or key == ord("A"):
+            self._vid_running = False            
+            self._vid_direction = False
+        #Right arrow key
+        elif key == ord("d") or key == ord("D"):            
+            self._vid_running = False            
+            self._vid_direction = True
+        
         
         elif key == 27:
             self._vid_running = False            
