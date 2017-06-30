@@ -12,7 +12,7 @@ class VidPlayer:
     _vid_speed = 50
     _vid_paused = False
     _vid_running = True
-    _vid_direction = True
+    _vid_direction = 'right'
     _vid_dance = ''    
 
     def __init__(self, path = None):        
@@ -90,29 +90,29 @@ class VidPlayer:
         elif key == ord("y") or key == ord("Y"):
             self._vid_running = False            
             self._vid_dance = 0
-            self._vid_direction = True
+            self._vid_direction = 'right'
         
         elif key == ord("n") or key == ord("N"):
             self._vid_running = False            
             self._vid_dance = 1
-            self._vid_direction = True
+            self._vid_direction = 'right'
         
         #Up arrow key 
         elif key == ord("w") or key == ord("W"):
             self._vid_running = False            
-            self._vid_direction = False
+            self._vid_direction = 'up'
         #Down arrow key
         elif key == ord("s") or key == ord("S"):
             self._vid_running = False            
-            self._vid_direction = True        
+            self._vid_direction = 'down'        
         #Left arrow key 
         elif key == ord("a") or key == ord("A"):
             self._vid_running = False            
-            self._vid_direction = False
+            self._vid_direction = 'left'
         #Right arrow key
         elif key == ord("d") or key == ord("D"):            
             self._vid_running = False            
-            self._vid_direction = True
+            self._vid_direction = 'right'
         
         
         elif key == 27:
