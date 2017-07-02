@@ -2,7 +2,7 @@
 #The directory has to follow the WDD structure
 #The angle is stored in a ForList.csv for each waggle run
 #When done with all the waggle runs it writes down all results under 'Data/%Y%m%d_%H%M_decoder.csv'
-#The output format is as follows:
+#The output schema is as follows:
 #[key] + [length] + [raw_angle] + [x0] + [y0] + [date] + [time] +  [cam_angle]
 #Example:
 #20160814_1001_1/1,29,-5.78629923147,60.0,70.6,2016/08/14,10:01:42:582,5.78629923147
