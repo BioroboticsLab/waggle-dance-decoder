@@ -257,7 +257,11 @@ def main():
     #Iterates through all the dances
     #Filters all dance subdirectories
     folders = filter(lambda x: os.path.isdir(os.path.join(path, x)), os.listdir(path))
-    i = datetime.datetime.now()            
+    i = datetime.datetime.now()
+    #prints the header
+    with open('Data/' + str(i.strftime('%Y%m%d_%H%M')) + '_decoder.csv', 'at', newline='') as out_file:            
+        writer = csv.writer(out_file, delimiter=',', quotechar=' ', quoting=csv.QUOTE_MINIMAL)        
+        writer.writerow(['key, length, raw_angle, x0, y0, date, time, cam_angle'])
     for folder in folders:
         #Sets the path to the current dance
         tmp_path = os.path.join(path,folder)        

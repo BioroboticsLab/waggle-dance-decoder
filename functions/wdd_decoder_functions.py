@@ -11,8 +11,6 @@ from DoG import DoG
 from scipy import stats
 from file_manager import File_manager
 
-#input parameters
-#path     - Path to the dances
 #Radian
 radi = 180/np.pi
 
