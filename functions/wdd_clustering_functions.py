@@ -57,7 +57,7 @@ Given:
 Return:
     C         - dictionary C, where:
                 key = clusterID
-                vector = [WRun key, camAngle]
+                vector = [WRuns key, camAngles]
 """    
 def generate_clusters(A, max_d):
     B = np.array([[A[key][2], A[key][3], A[key][4]/4] for key in A])
@@ -102,12 +102,13 @@ def get_error(test_points, maybeAngle):
 Fit model to data using the RANSAC algorithm
 Given:
     data - a set of observed data points    
-    n - the minimum number of data values required to fit the model
+    n - the minimum number of data values required to compute an angle
     k - the maximum number of iterations allowed in the algorithm
     t - a threshold value for determining when a data point fits a model
     d - the number of close data values required to assert that a model fits well to data
 Return:
-    bestfit - model parameters which best fit the data (or nil if no good model is found)
+    bestfit          - angle that best fit the data (or nil if no good model is found)
+    best_inlier_idxs - indexes of inlier data (or nil if no good model is found)
 """
 def ransac_WDD(data, n, k, t, d):
     it = 0
@@ -142,8 +143,21 @@ def ransac_WDD(data, n, k, t, d):
     else:
         return bestfit, best_inlier_idxs
 
-
-def clean_clusters(C, A, n, k, t, d):
+"""
+Clean a set of clusters
+Given:
+    A - dictionary of data returned by data_format
+    C - dictionary of clusters returned by generate_clusters
+    n - the minimum number of data values required to compute an angle
+    k - the maximum number of iterations allowed in the algorithm
+    t - a threshold value for determining when a data point fits a model
+    d - the number of close data values required to assert that a model fits well to data
+Return:
+    cleanClusters - dictionary cleanClusters, where:
+                    key = clusterID
+                    vector = [avg_angle, avg_length, WRuns keys]
+"""
+def clean_clusters(A, C, n, k, t, d):
     #dictionary for the results
     cleanClusters = {}
     #iterates over all clusters
@@ -152,6 +166,7 @@ def clean_clusters(C, A, n, k, t, d):
         if len(C[clusterID]) > 3:
             #loading the angles
             data = np.array([x[1] for x in C[clusterID]])
+            temp_ransac = []
             #RANSAC is applied to each cluster
             temp_ransac = ransac_WDD(data, n, k, t, d)
             #clear auxiliary variables
@@ -161,7 +176,6 @@ def clean_clusters(C, A, n, k, t, d):
                 for i in temp_ransac[1]:                    
                     temp_cluster.append(C[clusterID][i][0])
                     accum += A[C[clusterID][i][0]][0]
-                avg_length = accum/len(temp_ransac[1])
-            cleanClusters[clusterID] = [temp_ransac[0], avg_length, temp_cluster]
-    
+                avg_length = accum/len(temp_ransac[1])                
+                cleanClusters[clusterID] = temp_ransac[0], avg_length, temp_cluster
     return cleanClusters
