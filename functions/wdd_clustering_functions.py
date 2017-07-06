@@ -29,7 +29,7 @@ Return:
                 key = WRun key
                 vector = [length_ms, cam_angle, x0, y0, timeStamp_sec, HH, mm]
 """
-def data_format(inputFile, camID):
+def data_format(inputFile, camID, plot = 0):
     A = {}
     with open(inputFile, 'rt', encoding='utf-8-sig') as DecFile:
         reader = csv.reader(DecFile, delimiter = ',')
@@ -44,8 +44,12 @@ def data_format(inputFile, camID):
                 split_time = row[6].split(":")
                 #Timestamp to seconds, disregard miliseconds
                 time_sec = int(split_time[0])*3600 + int(split_time[1])*60 + int(split_time[2])
-                #A[key] = [length_ms, float(row[-1]), float(row[3]), float(row[4]), time_sec, split_time[0], split_time[1]]
-                A[key] = [length_ms, float(row[2]), float(row[3]), float(row[4]), time_sec, split_time[0], split_time[1]]
+                #if plot is true then it returns cam_angle
+                if (plot):
+                    A[key] = [length_ms, float(row[-1]), float(row[3]), float(row[4]), time_sec, split_time[0], split_time[1]]
+                #otherwise raw_angle is returned
+                else:
+                    A[key] = [length_ms, float(row[2]), float(row[3]), float(row[4]), time_sec, split_time[0], split_time[1]]
     return A
 
 
@@ -176,6 +180,9 @@ def clean_clusters(A, C, n, k, t, d):
                 for i in temp_ransac[1]:                    
                     temp_cluster.append(C[clusterID][i][0])
                     accum += A[C[clusterID][i][0]][0]
-                avg_length = accum/len(temp_ransac[1])                
-                cleanClusters[clusterID] = temp_ransac[0], avg_length, temp_cluster
+                avg_length = accum/len(temp_ransac[1])
+                HH = int(A[C[clusterID][i][0]][5])
+                mm = int(A[C[clusterID][i][0]][6])
+                #Returns [angle, avg_length, HH, mm, WRuns keys]
+                cleanClusters[clusterID] = temp_ransac[0], avg_length, HH, mm, temp_cluster
     return cleanClusters
