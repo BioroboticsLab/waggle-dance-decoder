@@ -11,30 +11,28 @@ feederLocation = [1470, 2370];
 % read in raw data
 A = loadData(datafilename);
 A
-% discard short waggles and short dances
-A = filterData(A);
 
 % azimuth translation and angle conversion to normality (0° is on x-axis
 % and rotates counter-clockwise)
 A = translateToRelativeSunDirection(A);
 
 % conversion to meters
-A(:,1) = meter_per_ms * A(:,1); 
+A(:,2) = meter_per_ms * A(:,2); 
 
 % conversion to pixels
-A(:,1) = px_per_meter * A(:,1);
+A(:,2) = px_per_meter * A(:,2);
 
 close all
 h = imshow(mapfilename)
 hold on
 
 
-P = [A(:,1) .* cos( -A(:,2)  ) + hiveLocation(1), A(:,1) .* sin( -A(:,2) ) + hiveLocation(2)];
+P = [A(:,2) .* cos( -A(:,3)  ) + hiveLocation(1), A(:,2) .* sin( -A(:,3) ) + hiveLocation(2)];
 
-meanDanceLocationWeighted = [ mean( A(:,5) .* P(:, 1) ), mean( A(:,5) .* P(:, 2) )];
+meanDanceLocationWeighted = [ mean( A(:,6) .* P(:, 1) ), mean( A(:,6) .* P(:, 2) )];
 
 
-a = circMean(-A(:,2));
+a = circMean(-A(:,3));
 plot( [0 1000*cos(a)]+ hiveLocation(1), [0 1000*sin(a)]+ hiveLocation(2), '--', ...
                                                 'Color', [.75 0 .75], ...
                                                 'LineWidth',0.5, ...
@@ -51,7 +49,7 @@ plot( P(:, 1), P(:, 2), 'o',   'MarkerEdgeColor','w', ...
                                                 'MarkerSize',5, ...
                                                 'LineSmoothing', 'on', ...
                                                 'LineWidth',0.1);
-% plot( mean(P(:,1)), mean(P(:,2)), 'ro' )
+
 plot( meanDanceLocationWeighted(1), meanDanceLocationWeighted(2), 'o',   'MarkerEdgeColor','w', ...
                                                 'MarkerFaceColor','b', ...
                                                 'MarkerSize',6, ...
