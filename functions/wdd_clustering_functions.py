@@ -34,7 +34,7 @@ def data_format(inputFile, camID, plot = 0):
     with open(inputFile, 'rt', encoding='utf-8-sig') as DecFile:
         reader = csv.reader(DecFile, delimiter = ',')
         next(reader)        
-        for row in reader:
+        for row in reader:            
             #Only WRuns from camera camID
             if (row[0][14] == camID):    
                 key = row[0]
@@ -161,7 +161,8 @@ Return:
                     key = clusterID
                     vector = [avg_angle, avg_length, WRuns keys]
 """
-def clean_clusters(A, C, n, k, t, d):
+#def clean_clusters(A, C, n, k, t, d):
+def clean_clusters(A, C, n, t):
     #dictionary for the results
     cleanClusters = {}
     #iterates over all clusters
@@ -171,7 +172,11 @@ def clean_clusters(A, C, n, k, t, d):
             #loading the angles
             data = np.array([x[1] for x in C[clusterID]])
             temp_ransac = []
-            #RANSAC is applied to each cluster
+            #maximum number of iterations
+            k = 5*len(C[clusterID])
+            #minimum number of inliers to be considered a valid model
+            d = 0.6*len(C[clusterID])
+            #RANSAC is applied to each cluster            
             temp_ransac = ransac_WDD(data, n, k, t, d)
             #clear auxiliary variables
             temp_cluster = []
