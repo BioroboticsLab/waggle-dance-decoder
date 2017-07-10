@@ -167,7 +167,7 @@ def clean_clusters(A, C, n, t):
     cleanClusters = {}
     #iterates over all clusters
     for clusterID in C:
-        #Only clusters with a minimum of 3 elements are considered as potential dances
+        #Only clusters with more than 3 elements are considered as potential dances
         if len(C[clusterID]) > 3:
             #loading the angles
             data = np.array([x[1] for x in C[clusterID]])
