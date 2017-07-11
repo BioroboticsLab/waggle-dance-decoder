@@ -29,7 +29,7 @@ Return:
                 key = WRun key
                 vector = [length_ms, cam_angle, x0, y0, timeStamp_sec, HH, mm]
 """
-def data_format(inputFile, camID, plot = 0):
+def data_format(inputFile, camID, plot = False):
     A = {}
     with open(inputFile, 'rt', encoding='utf-8-sig') as DecFile:
         reader = csv.reader(DecFile, delimiter = ',')
