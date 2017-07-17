@@ -91,6 +91,8 @@ class VidPlayer:
     _vid_speed = 50
     _vid_paused = False
     _vid_running = True
+    _vid_direction = 'right'
+    _vid_dance = 10
 
     def __init__(self, path = None):
         self._vid_path    = path
@@ -106,6 +108,9 @@ class VidPlayer:
             self._vid_speed = 10
         else:
             self._vid_speed = number
+            
+    def set_vid_dance(self, dance):
+        self._vid_dance = dance
 
     '''
     Returns the actual path of the video source
@@ -130,6 +135,9 @@ class VidPlayer:
     '''
     def get_vid_running(self):
         return self._vid_running
+        
+    def get_vid_dance(self):
+        return self._vid_dance
 
     '''
     Some Controlls
@@ -151,9 +159,28 @@ class VidPlayer:
             else:
                 self._vid_paused = False
                 self._vid_speed = 50
+                
+        elif key == ord("n") or key == ord("N"):
+            self._vid_running = False            
+            self._vid_dance = 0
+            self._vid_direction = 'right'
+            
+        elif key == ord("y") or key == ord("Y"):
+            self._vid_running = False
+            self._vid_dance = 1
+            self._vid_direction = 'right'       
+            
+        elif key == ord("v") or key == ord("V"):
+            self._vid_running = False            
+            self._vid_dance = 2
+            self._vid_direction = 'right'
 
         elif key == ord("c") or key == ord("C"):
             self._vid_running = False
+            
+        elif key == 27:
+            self._vid_running = False            
+            self._vid_dance = -1
 
     def vid_restart(self):
         self._vid_capture = cv2.VideoCapture(self._vid_path)
@@ -183,10 +210,14 @@ def main():
     for folder in folders:
         tmp_path = os.path.join(path,folder)        
         wd_runs = os.listdir(tmp_path)
+        
+        if vp.get_vid_dance() < 0:
+                break
 
         for run in wd_runs:
+            vp.set_vid_dance(10)
             vp.set_vid_path(tmp_path + '/' + run + '/' + 'image_%03d.png')
-            capture = vp.get_vid_capture()
+            capture = vp.get_vid_capture()                                    
 
             while(vp.get_vid_running()):
                 ret, image = capture.read()                
@@ -199,15 +230,35 @@ def main():
                 else:
                     capture = vp.vid_restart()
 
+            if (vp.get_vid_dance() < 0):
+                break
+                
             draw.calc_angle()
 
-            if (draw.get_drawn()):
-                with open(tmp_path + '/' + run + '/' + 'result.csv', 'w', newline='', encoding='utf-8-sig') as out:
-                    csv_out = csv.writer(out)
-                    csv_out.writerow(['Key'] + ['Start Point'] + ['End Point'] + ['Angle'])
-                    csv_out.writerow( [folder + '/' + run] + [draw.get_refernce_points()[0]] + [draw.get_refernce_points()[1]] + [draw.get_angle()])
-                    counter += 1
-
+            if (vp.get_vid_dance() == 0):
+                with open(tmp_path + '/' + run + '/' + 'gt.csv', 'w', newline='', encoding='utf-8-sig') as out:
+                    csv_out = csv.writer(out)                    
+                    csv_out.writerow('n')
+                    print('Not a dance!')
+                
+            elif (1 <= vp.get_vid_dance() <= 2):
+                with open(tmp_path + '/' + run + '/' + 'gt.csv', 'w', newline='', encoding='utf-8-sig') as out:
+                    csv_out = csv.writer(out)                    
+                    if (vp.get_vid_dance() == 1):
+                        csv_out.writerow('j')
+                        print('It is a dance!')
+                    else:
+                        csv_out.writerow('v')
+                        print('Probably a dance--')
+                    
+                if (draw.get_drawn()):
+                    with open(tmp_path + '/' + run + '/' + 'result.csv', 'w', newline='', encoding='utf-8-sig') as out:
+                        csv_out = csv.writer(out)
+                        csv_out.writerow(['Key'] + ['Start Point'] + ['End Point'] + ['Angle'])
+                        csv_out.writerow( [folder + '/' + run] + [draw.get_refernce_points()[0]] + [draw.get_refernce_points()[1]] + [draw.get_angle()])
+                        print('Angle: ' + str(draw.get_angle()))
+                    
+            counter += 1
             print(counter)
             draw.reset_drawing()
             first_frame = True
@@ -227,16 +278,17 @@ def main():
         for run in wd_runs:
             #Path to next run
             key = os.path.join(tmp_path,run)
-            #Reading
-        
-            with open(key + '/' + 'result.csv', 'rt', encoding='utf-8-sig') as in_file:
-                reader = csv.reader(in_file, delimiter=',', quotechar='|')
-                row = next(reader)
-                row = next(reader)                
-                        
-            with open('Data/GTData/' + str(i.strftime('%Y%m%d_%H%M')) + '.csv', 'at', newline='') as out_file:            
-                writer = csv.writer(out_file, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)                
-                writer.writerow(row)    
+            
+            if os.path.isfile(key + '/' + 'result.csv'):                
+                #Reading        
+                with open(key + '/' + 'result.csv', 'rt', encoding='utf-8-sig') as in_file:
+                    reader = csv.reader(in_file, delimiter=',', quotechar='|')
+                    row = next(reader)
+                    row = next(reader)                
+                            
+                with open('Data/GTData/' + str(i.strftime('%Y%m%d_%H%M')) + '.csv', 'at', newline='') as out_file:            
+                    writer = csv.writer(out_file, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)                
+                    writer.writerow(row)    
     # TO HERE
     print ('Your data has been correctly saved in Data/GTData/' + str(i.strftime('%Y%m%d_%H%M')) + '.csv')
 if __name__ == "__main__":
