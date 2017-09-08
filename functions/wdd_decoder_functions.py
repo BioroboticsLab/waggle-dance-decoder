@@ -1,6 +1,4 @@
 # coding=utf-8
-#This function generates an array of diff_images
-#Where diff_img is the matrix resulting from the difference between two consecutive frames
 
 import os
 import glob
@@ -223,11 +221,11 @@ def read_DDvector(WRPath):
     dd_float = [val for val in dd_float if val != -1]
     return dd_float
 
-#Returns an angle with adjusted orientation
-#Input parameters:
+#Returns an angles with adjusted orientation
+#arguments:
 #fft_angles: A dictionary containing the angles computed using the fft method.
 #dd_angles: A dictionary containing the vectors defined using the dot detector coordinates.
-#Output:
+#returns:
 #adj_angles: A dictionary containing the corrected angles.
 def def_orientation(fft_angles, dd_angles):    
     adj_angles = {}
