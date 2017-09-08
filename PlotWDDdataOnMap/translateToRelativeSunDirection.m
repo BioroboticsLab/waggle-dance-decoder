@@ -2,7 +2,7 @@ function A = translateToRelativeSunDirection(A)
 
 for i = 1 : length(A)
     % utc im Sommer ist zwei Stunden früher
-    utcString = ['2016/08/14 ' num2str(A(i,4) - 2) ':' num2str(A(i,5)) ':00'];    
+    utcString = ['2016/08/16 ' num2str(A(i,4) - 2) ':' num2str(A(i,5)) ':00'];    
     
     %http://www.wieweit.net/gps_koordinaten-hohe.php
     [Az El] = SolarAzEl(utcString, 52.457259, 13.296225, 59.5);
