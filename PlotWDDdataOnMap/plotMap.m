@@ -13,6 +13,7 @@ FL = [1470, 2370];
 
 % Distance hive-feeder in pixels
 DHF = sqrt((HL(1)-FL(1))^2 + (HL(2)-FL(2))^2);
+DHF
 
 %Angle hive-feeder
 AHF = atan2((HL(1)-FL(1)),-(HL(2)-FL(2))) + pi/2;
@@ -39,17 +40,6 @@ a
 v1 = [cos(AHF),sin(AHF)];
 v2 = [cos(a),sin(a)];
 directionError = acos(dot(v1,v2))
-
-%Mean and SD error at dance level
-count = 1;
-for i = 1:length(A)
-    v2 = [cos(A),sin(a)];
-    if (Temp(i,1) > 20 && Temp(i,2) > 20 && Temp(i,1) < 4573 && Temp(i,2) < 3080)        
-        Error(count) = Temp(i,:);
-        count = count + 1;
-    end
-end
-
 
 close all
 h = imshow(mapfilename)
