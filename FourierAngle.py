@@ -1,5 +1,5 @@
-#Script to compute angle for all waggle runs in a directory
-#The directory has to follow the WDD structure
+#Script to compute angle for all waggle runs in a day directory
+#The directory has to follow the WDD structure "...YYYYMMDD/YYYYMMDD_HHmm_C/WR/*.png"
 #The angle is stored in a ForList.csv for each waggle run
 #When done with all the waggle runs it writes down all results under 'Data/%Y%m%d_%H%M_decoder.csv'
 #The output schema is as follows:
@@ -218,11 +218,11 @@ def main():
     if (len(argv) == 2):
         path = argv[1]
     
-    #Filters all dance subdirectories
+    #Filters all minute-camera subdirectories
     folders = filter(lambda x: os.path.isdir(os.path.join(path, x)), os.listdir(path))
-    #Iterates through all the dances
+    #Iterates through all the minute-camera directories
     for folder in folders:
-        #Sets the path to the current dance
+        #Sets the path to the current minute-camera directory
         tmp_path = os.path.join(path,folder)
         #List of waggle runs
         wd_runs = os.listdir(tmp_path)
@@ -259,7 +259,7 @@ def main():
     folders = filter(lambda x: os.path.isdir(os.path.join(path, x)), os.listdir(path))
     i = datetime.datetime.now()
     #prints the header
-    with open('Data/' + str(i.strftime('%Y%m%d_%H%M')) + '_decoder.csv', 'at', newline='') as out_file:            
+    with open(str(i.strftime('%Y%m%d_%H%M')) + '_decoder.csv', 'at', newline='') as out_file:            
         writer = csv.writer(out_file, delimiter=',', quotechar=' ', quoting=csv.QUOTE_MINIMAL)        
         writer.writerow(['key, length, raw_angle, x0, y0, date, time, cam_angle'])
     for folder in folders:
@@ -277,10 +277,10 @@ def main():
                 reader = csv.reader(in_file, delimiter=',', quotechar='|')
                 row = next(reader)                
                         
-            with open('Data/' + str(i.strftime('%Y%m%d_%H%M')) + '_decoder.csv', 'at', newline='') as out_file:            
+            with open(str(i.strftime('%Y%m%d_%H%M')) + '_decoder.csv', 'at', newline='') as out_file:            
                 writer = csv.writer(out_file, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)                
                 writer.writerow(row)    
     # TO HERE
-    print ('Your data has been propertly saved in Data/' + str(i.strftime('%Y%m%d_%H%M')) + '_decoder.csv')
+    print ('Your data has been propertly saved in ' + str(i.strftime('%Y%m%d_%H%M')) + '_decoder.csv')
 if __name__ == "__main__":
     main()

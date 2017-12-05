@@ -10,7 +10,7 @@ Given:
     -v --verbose: Verbose mode on.
     
     [arguments]
-    file: Path to input file with withdecoder format.
+    file: Path to input file with decoder format (generated with FourierAngle.py).
     cam: Camera to analyze, 1 or 0.
     max_d: Euclidean distance threshold for clustering process.
     n: Minimum number of data values required to compute an angle during RANSAC process.
@@ -54,8 +54,8 @@ def Clustering(plot, verbose, file, cam, max_d, n, t):
     A={}
     C={}
     CClusters={}
-    #Extract input file's name 
-    split_path = file.split("\\")    
+    #Extract input file's name
+    split_path = file.split("\\")        
     
     if (verbose):        
         click.echo('Current configuration: ')
@@ -88,7 +88,7 @@ def Clustering(plot, verbose, file, cam, max_d, n, t):
     dt = datetime.datetime.now()
 
     if (plot):        
-        outputFile = 'Data/Filtering/' + split_path[-1][:-4] + '_cam' + cam + '_plot_' + str(dt.strftime('%Y%m%d_%H%M')) + '.csv'
+        outputFile = split_path[-1][:-4] + '_cam' + cam + '_plot_' + str(dt.strftime('%Y%m%d_%H%M')) + '.csv'
         #All GTRuns
         if (os.path.exists(outputFile)):
             os.remove(outputFile)
@@ -103,7 +103,7 @@ def Clustering(plot, verbose, file, cam, max_d, n, t):
         click.echo('Results saved in ' + outputFile)
         
     else:
-        outputFile = 'Data/Filtering/' + split_path[-1][:-4] + '_cam' + cam + '_' + str(dt.strftime('%Y%m%d_%H%M')) + '.csv'
+        outputFile = split_path[-1][:-4] + '_cam' + cam + '_' + str(dt.strftime('%Y%m%d_%H%M')) + '.csv'
         #All GTRuns
         if (os.path.exists(outputFile)):
             os.remove(outputFile)
